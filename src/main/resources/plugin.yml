@@ -1,0 +1,6 @@
+name: SimpleTrade
+version: ${project.version}
+main: eu.zzagro.simpletrade.SimpleTrade
+commands:
+  trade:
+  accept:
