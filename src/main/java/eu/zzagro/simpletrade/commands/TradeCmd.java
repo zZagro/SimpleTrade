@@ -16,8 +16,8 @@ import java.util.UUID;
 
 public class TradeCmd implements CommandExecutor {
 
-    public static Map<Player, Player> playerNameMap = new HashMap<>();
-    public static Map<Player, Player> targetNameMap = new HashMap<>();
+    public static Map<Player, Player> getPlayerMap = new HashMap<>();
+    public static Map<Player, Player> getTargetMap = new HashMap<>();
     public static Map<Player, UUID> targetUuidMap = new HashMap<>();
     public static Map<Player, UUID> playerUuidMap = new HashMap<>();
     public UUID uuid;
@@ -46,15 +46,15 @@ public class TradeCmd implements CommandExecutor {
                             player.sendMessage(SimpleTrade.prefix + SimpleTrade.color("&cYou can't trade with yourself!"));
                             return false;
                         }
-                        if (!(targetNameMap.containsKey(player))) {
+                        if (!(getTargetMap.containsKey(player))) {
                             target.sendMessage(SimpleTrade.prefix + SimpleTrade.color("&6" + player.getName() + " &ahas sent you a trade request!"));
 
                             uuid = UUID.randomUUID();
                             targetUuidMap.put(target, uuid);
                             playerUuidMap.put(player, uuid);
 
-                            playerNameMap.put(target, player);
-                            targetNameMap.put(player, target);
+                            getPlayerMap.put(target, player);
+                            getTargetMap.put(player, target);
 
                             TextComponent accept = new TextComponent();
                             accept.setText("[ACCEPT] ");
@@ -78,22 +78,27 @@ public class TradeCmd implements CommandExecutor {
                             target.spigot().sendMessage(text);
                             player.sendMessage(SimpleTrade.prefix + SimpleTrade.color("&aYou've sent a trade request to &6" + target.getName()));
 
+                            Bukkit.getOnlinePlayers().forEach(p -> {
+                                p.sendMessage("Target: " + getTargetMap.get(player).getName());
+                                p.sendMessage("Player: " + getPlayerMap.get(target).getName());
+                            });
+
                             task = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
                                 targetUuidMap.remove(target);
-                                playerNameMap.remove(target);
-                                targetNameMap.remove(player);
+                                getPlayerMap.remove(target);
+                                getTargetMap.remove(player);
                                 player.sendMessage(SimpleTrade.prefix + SimpleTrade.color("&cYour trade request to &6" + target.getName() + " &cexpired!"));
                                 target.sendMessage(SimpleTrade.prefix + SimpleTrade.color("&cThe trade request from &6" + player.getName() + " &cexpired!"));
                             }, 20*15);
-                        } else if (!(targetNameMap.get(player).getName().equalsIgnoreCase(target.getDisplayName()) && playerNameMap.get(target).getName().equalsIgnoreCase(player.getDisplayName()))) {
+                        } else if (!(getTargetMap.get(player).getName().equalsIgnoreCase(target.getDisplayName()) && getPlayerMap.get(target).getName().equalsIgnoreCase(player.getDisplayName()))) {
                             target.sendMessage(SimpleTrade.prefix + SimpleTrade.color("&6" + player.getName() + " &ahas sent you a trade request!"));
 
                             uuid = UUID.randomUUID();
                             targetUuidMap.put(target, uuid);
                             playerUuidMap.put(player, uuid);
 
-                            playerNameMap.put(target, player);
-                            targetNameMap.put(player, target);
+                            getPlayerMap.put(target, player);
+                            getTargetMap.put(player, target);
 
                             TextComponent accept = new TextComponent();
                             accept.setText("[ACCEPT] ");
@@ -119,8 +124,8 @@ public class TradeCmd implements CommandExecutor {
 
                             task = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
                                 targetUuidMap.remove(target);
-                                playerNameMap.remove(target);
-                                targetNameMap.remove(player);
+                                getPlayerMap.remove(target);
+                                getTargetMap.remove(player);
                                 player.sendMessage(SimpleTrade.prefix + SimpleTrade.color("&cYour trade request to &6" + target.getName() + " &cexpired!"));
                                 target.sendMessage(SimpleTrade.prefix + SimpleTrade.color("&cThe trade request from &6" + player.getName() + " &cexpired!"));
                             }, 20*15);

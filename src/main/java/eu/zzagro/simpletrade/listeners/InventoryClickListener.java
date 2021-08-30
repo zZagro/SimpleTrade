@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -34,11 +35,10 @@ public class InventoryClickListener implements Listener {
             if (e.getCurrentItem() != null) {
                 if (e.getInventory().getTitle().equalsIgnoreCase("Trade Menu")) {
                     e.setCancelled(true);
-                    Player target = Bukkit.getPlayerExact(TradeCmd.targetNameMap.get(player).getName());
+                    Player target = Bukkit.getPlayerExact(TradeCmd.getTargetMap.get(player).getName());
                     if (target != null) {
                         if (TradeCmd.playerUuidMap.get(player).equals(TradeCmd.targetUuidMap.get(target))) {
                             isPlayerReady.put(player, false);
-                            isTargetReady.put(target, false);
 
                             ItemStack confirmItem = plugin.metaManager.confirmItem;
                             ItemMeta confirmMeta = plugin.metaManager.getConfirmMeta();
@@ -47,29 +47,23 @@ public class InventoryClickListener implements Listener {
                             ItemStack waitingItem = plugin.metaManager.waitingItem;
                             ItemMeta waitingMeta = plugin.metaManager.getWaitingMeta();
 
-                            if (e.getWhoClicked() == player) {
-                                if (e.getSlot() == 39 && e.getCurrentItem().isSimilar(confirmItem)) {
-                                    player.sendMessage("Player: " + TradeCmd.playerNameMap.get(target).getName() + ", Target: " + target.getName());
-                                    isPlayerReady.put(player, true);
-                                    target.getOpenInventory().setItem(41, readyItem);
-                                } else if (e.getSlot() == 39 && e.getCurrentItem().isSimilar(readyItem)) {
-                                    isPlayerReady.put(player, false);
-                                    target.getOpenInventory().setItem(41, waitingItem);
-                                }
-                            } else if (e.getWhoClicked() == target) {
-                                player.sendMessage("0");
-                                if (e.getSlot() == 39 && e.getCurrentItem().isSimilar(confirmItem)) {
-                                    isTargetReady.put(target, true);
-                                    player.getOpenInventory().setItem(41, readyItem);
-                                } else if (e.getSlot() == 39 && e.getCurrentItem().isSimilar(readyItem)) {
-                                    isTargetReady.put(target, false);
-                                    player.getOpenInventory().setItem(41, waitingItem);
-                                }
+                            if (e.getSlot() == 39 && e.getCurrentItem().isSimilar(confirmItem)) {
+                                //player.sendMessage("Player: " + TradeCmd.playerNameMap.get(target).getName() + ", Target: " + target.getName());
+                                isPlayerReady.put(player, true);
+                                target.getInventory().setItem(41, readyItem);
+                                player.getInventory().setItem(39, readyItem);
+                            } else if (e.getSlot() == 39 && e.getCurrentItem().isSimilar(readyItem)) {
+                                isPlayerReady.put(player, false);
+                                target.getInventory().setItem(41, waitingItem);
+                                player.getInventory().setItem(39, confirmItem);
                             }
-
                             if (isTargetReady.get(target) && isPlayerReady.get(player)) {
                                 player.getOpenInventory().close();
                                 target.getOpenInventory().close();
+                            }
+
+                            if (e.getClickedInventory() instanceof PlayerInventory) {
+
                             }
                         }
                     } else {

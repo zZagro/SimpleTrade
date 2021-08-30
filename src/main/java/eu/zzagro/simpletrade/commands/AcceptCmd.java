@@ -21,13 +21,15 @@ public class AcceptCmd implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
+            Player target = TradeCmd.getTargetMap.get(player);
+            if (target == null) return false;
             if (args.length == 1) {
                 if (TradeCmd.targetUuidMap.containsKey(player)) {
                     UUID uuid = TradeCmd.targetUuidMap.get(player);
                     if (args[0].equalsIgnoreCase(uuid.toString())) {
                         Bukkit.getScheduler().cancelTask(TradeCmd.task.getTaskId());
-                        plugin.tradeInv.openTargetInv(player, TradeCmd.playerNameMap.get(player));
-                        plugin.tradeInv.openPlayerInv(TradeCmd.playerNameMap.get(player), player);
+                        plugin.tradeInv.openTargetInv(player, target);
+                        plugin.tradeInv.openPlayerInv(target, player);
                     } else {
                         player.sendMessage(SimpleTrade.prefix + SimpleTrade.color("&cThat trade doesn't exist"));
                     }

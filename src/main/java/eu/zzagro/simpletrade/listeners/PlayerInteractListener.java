@@ -2,6 +2,7 @@ package eu.zzagro.simpletrade.listeners;
 
 import eu.zzagro.simpletrade.SimpleTrade;
 import eu.zzagro.simpletrade.commands.TradeCmd;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
